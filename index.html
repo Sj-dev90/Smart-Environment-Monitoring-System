@@ -269,7 +269,7 @@
         }
 
         function fetchData() {
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?results=20`;
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=0MAZLK6X26AFC15U&results=20`;
             
             fetch(url)
                 .then(res => res.json())
@@ -280,9 +280,9 @@
                     }
 
                     const latest = feeds[feeds.length - 1];
-                    const currentAqi = parseFloat(latest.field1) || 0;
+                    const temp = parseFloat(latest.field1) || 0;
                     const hum = parseFloat(latest.field2) || 0;
-                    const temp = parseFloat(latest.field3) || 0;
+                    const currentAqi = parseFloat(latest.field3) || 0;
 
                     document.getElementById('aqi-val').innerText = currentAqi;
                     document.getElementById('hum-val').innerText = hum + "%";
@@ -319,9 +319,9 @@
             feeds.forEach(feed => {
                 const date = new Date(feed.created_at);
                 times.push(date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
-                if (feed.field1) { aqiData.push(feed.field1); }
+                if (feed.field3) { aqiData.push(feed.field3); }
                 if (feed.field2) { humData.push(feed.field2); }
-                if (feed.field3) { tempData.push(feed.field3); }
+                if (feed.field1) { tempData.push(feed.field1); }
             });
 
             myChart.data.labels = times;
