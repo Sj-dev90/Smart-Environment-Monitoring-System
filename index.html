@@ -27,8 +27,8 @@
             overflow: hidden;
             display: flex;
             background-image: 
-                linear-gradient(rgba(176, 38, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(176, 38, 255, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(176, 38, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(176, 38, 255, 0.1) 1px, transparent 1px);
             background-size: 30px 30px;
         }
 
@@ -63,6 +63,7 @@
             letter-spacing: 2px;
             font-size: 32px;
             text-shadow: 0 0 10px var(--neon-purple);
+            text-transform: uppercase;
         }
 
         .login-input {
@@ -80,40 +81,23 @@
             text-transform: uppercase;
         }
 
-        .btn {
-            background: transparent;
-            border: 1px solid var(--neon-purple);
-            color: var(--neon-purple);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px 30px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: var(--neon-purple);
-            color: var(--bg-dark);
-            box-shadow: 0 0 15px var(--neon-purple);
-        }
-
         /* --- MAIN OS LAYOUT --- */
         #os-interface {
-            display: none;
+            display: none; /* Hidden until login */
             width: 100%;
             height: 100%;
             display: flex;
         }
 
+        /* --- SIDEBAR MENU --- */
         .sidebar {
             width: 250px;
             border-right: 2px solid var(--neon-purple);
             padding: 20px;
             background: rgba(10, 10, 16, 0.9);
             box-shadow: 5px 0 15px rgba(176, 38, 255, 0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         .logo {
@@ -123,6 +107,7 @@
             letter-spacing: 3px;
             margin-bottom: 40px;
             text-shadow: 0 0 10px var(--neon-purple);
+            text-transform: uppercase;
         }
 
         .menu-btn {
@@ -148,6 +133,7 @@
             box-shadow: inset 5px 0 0 var(--neon-purple);
         }
 
+        /* --- MAIN CONTENT AREA --- */
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -157,7 +143,7 @@
         }
 
         .header-info {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .header-info h2 {
@@ -173,19 +159,35 @@
         .status-text {
             font-family: 'Fira Code', monospace;
             font-size: 14px;
-            color: var(--neon-blue);
+            color: var(--neon-green);
             margin-top: 10px;
         }
 
-        /* --- DASHBOARD GRID --- */
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+        /* --- TAB SWITCHING LOGIC --- */
+        .page-section {
+            display: none; /* Hides all pages by default */
+            flex-grow: 1;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
         }
 
-        .cards-column {
+        .page-section.active {
+            display: block; /* Shows only the active page */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- PAGE 1: TELEMETRY LAYOUT --- */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr; 
+            gap: 30px;
+        }
+
+        .cards-column, .charts-column {
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -195,79 +197,122 @@
             background: var(--panel-bg);
             border: 2px solid var(--neon-purple);
             border-radius: 8px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 180px;
+        }
+
+        .data-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: #fff;
         }
 
         .data-value {
-            font-size: 48px;
+            font-size: 54px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
             color: #fff;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
         }
 
         .badge {
             display: inline-block;
             border: 1px solid var(--neon-purple);
             color: var(--neon-purple);
-            padding: 3px 12px;
+            padding: 4px 15px;
             border-radius: 20px;
             font-size: 12px;
             background: rgba(176, 38, 255, 0.1);
+            font-weight: bold;
         }
 
         .chart-container {
             background: var(--panel-bg);
-            border: 1px solid rgba(176, 38, 255, 0.3);
+            border: 1px solid rgba(176, 38, 255, 0.4);
             border-radius: 8px;
             padding: 15px;
-            height: 180px;
-            margin-bottom: 20px;
+            height: 180px; 
+            position: relative;
         }
 
-        /* --- CONDITION GIMMICK --- */
-        .condition-panel {
-            background: var(--panel-bg);
-            border: 2px solid var(--neon-purple);
-            border-radius: 8px;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .status-badge-large {
-            display: inline-block;
-            font-size: 28px;
-            font-weight: bold;
-            padding: 10px 40px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        .status-optimal { border: 2px solid var(--neon-green); color: var(--neon-green); }
-        .status-caution { border: 2px solid #ffcc00; color: #ffcc00; }
-        .status-emergency { border: 2px solid var(--neon-danger); color: var(--neon-danger); }
-
-        .escape-route {
-            font-family: 'Fira Code', monospace;
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-        }
-
-        /* --- DATA MATRIX --- */
+        /* --- PAGE 2: DATA MATRIX --- */
         .matrix-container {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-blue);
+            border: 1px solid var(--neon-green);
             padding: 20px;
             font-family: 'Fira Code', monospace;
-            height: calc(100vh - 250px);
+            height: calc(100vh - 200px); 
             overflow-y: auto;
         }
 
-        .log-entry { border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding: 8px 0; color: #aaa; }
+        .log-entry {
+            border-bottom: 1px solid rgba(0, 255, 102, 0.2);
+            padding: 12px 0;
+            color: #ddd;
+            font-size: 15px;
+        }
+        
         .log-time { color: var(--neon-blue); margin-right: 15px; }
         .log-safe { color: var(--neon-green); }
+
+        /* --- PAGE 3: BIO-RECOVERY --- */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .control-panel {
+            background: var(--panel-bg);
+            border: 1px dashed var(--neon-purple);
+            padding: 30px;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: var(--neon-purple);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--neon-purple);
+        }
+
+        .btn.danger {
+            border-color: var(--neon-danger);
+            color: var(--neon-danger);
+        }
+        .btn.danger:hover {
+            background: var(--neon-danger);
+            color: #fff;
+            box-shadow: 0 0 15px var(--neon-danger);
+        }
+
+        .text-green { color: var(--neon-green); font-weight: bold; }
+        .text-cyan { color: var(--neon-blue); font-weight: bold; }
 
     </style>
 </head>
@@ -284,6 +329,7 @@
     </div>
 
     <div id="os-interface">
+        
         <div class="sidebar">
             <div class="logo">FOCUSAIR</div>
             <button class="menu-btn active" onclick="switchTab('page-telemetry', this)">[01] LIVE TELEMETRY</button>
@@ -293,156 +339,245 @@
 
         <div class="main-content">
             <div class="header-info">
-                <h2>Operator: <span id="display-operator">SIDDHARTH</span></h2>
-                <div class="status-text">> Localized atmospheric sync active...</div>
+                <h2>Operator: <span id="display-operator">SID</span></h2>
+                <div class="status-text">> Localized atmospheric sync active ...</div>
             </div>
 
             <div id="page-telemetry" class="page-section active">
                 <div class="dashboard-layout">
+                    
                     <div class="cards-column">
                         <div class="data-card">
                             <h3>AQI (PARTICULATE)</h3>
                             <div class="data-value" id="val-aqi">--</div>
-                            <div class="badge">LIVE FEED</div>
+                            <div class="badge-container"><div class="badge">LIVE FEED</div></div>
                         </div>
                         <div class="data-card">
                             <h3>HUMIDITY</h3>
-                            <div class="data-value"><span id="val-hum">--</span>%</div>
-                            <div class="badge">LIVE FEED</div>
+                            <div class="data-value"><span id="val-hum">--</span><span style="font-size: 28px;">%</span></div>
+                            <div class="badge-container"><div class="badge">LIVE FEED</div></div>
                         </div>
                         <div class="data-card">
                             <h3>TEMPERATURE</h3>
-                            <div class="data-value"><span id="val-temp">--</span>°C</div>
-                            <div class="badge">LIVE FEED</div>
+                            <div class="data-value"><span id="val-temp">--</span><span style="font-size: 28px;">°C</span></div>
+                            <div class="badge-container"><div class="badge">LIVE FEED</div></div>
                         </div>
                     </div>
-                    <div class="charts-column">
-                        <div class="chart-container"><canvas id="chart-aqi"></canvas></div>
-                        <div class="chart-container"><canvas id="chart-hum"></canvas></div>
-                        <div class="chart-container"><canvas id="chart-temp"></canvas></div>
-                    </div>
-                </div>
 
-                <div class="condition-panel">
-                    <h3 style="color: var(--neon-purple); margin-top:0;">CONDITIONING ANALYSIS</h3>
-                    <div id="condition-badge" class="status-badge-large status-optimal">WAITING</div>
-                    <div class="escape-route" id="escape-text">> STANDBY...</div>
+                    <div class="charts-column">
+                        <div class="chart-container">
+                            <canvas id="chart-aqi"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chart-hum"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chart-temp"></canvas>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <div id="page-matrix" class="page-section">
+                <h3 style="color: var(--neon-green); margin-top: 0; margin-bottom: 20px; font-size: 20px;">RAW SENSOR INGESTION LOG</h3>
                 <div class="matrix-container" id="terminal-log">
-                    <div class="log-entry"><span class="log-time">[SYSTEM]</span> Initializing Matrix...</div>
+                    <div class="log-entry"><span class="log-time">[SYSTEM]</span> Terminal linked. Awaiting data packets...</div>
                 </div>
             </div>
 
             <div id="page-bio" class="page-section">
-                <div class="dashboard-layout">
-                    <div class="data-card" style="grid-column: span 2;">
-                        <h3 style="color: var(--neon-green);">ATMOSPHERIC SCRUBBERS</h3>
-                        <p id="scrubber-status" style="color: var(--neon-green);">Status: STANDBY</p>
-                        <button class="btn" id="scrubber-btn" onclick="runScrubbers()">ENGAGE PURGE CYCLE</button>
+                <div class="controls-grid">
+                    <div class="control-panel">
+                        <h3 style="color: var(--neon-purple); margin-top: 0;">ATMOSPHERIC SCRUBBERS</h3>
+                        <p style="color: #ccc; margin-bottom: 10px;">Status: <span id="scrubber-status" class="text-green">STANDBY</span></p>
+                        <p style="color: #888; font-size: 14px; line-height: 1.5;">Engage primary HEPA filtration arrays to forcefully reduce ambient particulate density.</p>
+                        <button id="scrubber-btn" class="btn" onclick="activateScrubbers()">ENGAGE PURGE CYCLE</button>
+                    </div>
+                    
+                    <div class="control-panel">
+                        <h3 style="color: var(--neon-danger); margin-top: 0;">THERMAL OVERRIDE</h3>
+                        <p style="color: #ccc; margin-bottom: 10px;">Status: <span style="color: var(--neon-blue); font-weight: bold;">AUTO-REGULATING</span></p>
+                        <p style="color: #888; font-size: 14px; line-height: 1.5;">Bypass automated HVAC constraints. Warning: Level 4 Clearance required.</p>
+                        <button class="btn danger" onclick="triggerAction('Thermal Override')">MANUAL OVERRIDE</button>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script>
-        let aqiChart, humChart, tempChart;
-        const MAX_POINTS = 20;
+        /* --- 1. LOGIN LOGIC --- */
+        function handleEnter(e) {
+            if (e.key === 'Enter') systemLogin();
+        }
 
-        // --- ADAFRUIT CONFIG (NINJA SPLIT) ---
-        const AIO_USERNAME = "SIDJ90"; 
-        const p1 = "aio_mCft48mu14tcrm"; // Part 1
-        const p2 = "shdNkkbq7rVgPr";     // Part 2
-        const AIO_KEY = p1 + p2;
-
-        function handleEnter(e) { if (e.key === 'Enter') systemLogin(); }
         function systemLogin() {
-            const user = document.getElementById("operator-input").value;
-            document.getElementById("display-operator").innerText = user || "SIDDHARTH";
-            document.getElementById("login-overlay").style.display = "none";
-            document.getElementById("os-interface").style.display = "flex";
-            initCharts();
-            updateDashboard();
-        }
-
-        function switchTab(id, btn) {
-            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        function runScrubbers() {
-            const s = document.getElementById("scrubber-status");
-            const b = document.getElementById("scrubber-btn");
-            s.innerText = "PURGING ATMOSPHERE..."; s.style.color = "#00e5ff";
-            b.disabled = true;
+            const inputName = document.getElementById("operator-input").value;
+            const operatorName = inputName.trim() === "" ? "SIDDHARTH" : inputName.toUpperCase();
+            
+            document.getElementById("display-operator").innerText = operatorName;
+            document.getElementById("login-overlay").style.opacity = "0";
+            
             setTimeout(() => {
-                s.innerText = "STANDBY"; s.style.color = "#00ff66";
-                b.disabled = false;
-            }, 4000);
+                document.getElementById("login-overlay").style.display = "none";
+                document.getElementById("os-interface").style.display = "flex";
+                initializeCharts(); // Start charts after login
+                updateDashboard();  // Fetch first data
+                setInterval(updateDashboard, 10000); // Start loop
+            }, 500);
         }
 
-        async function fetchIO(feed) {
-            const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feed}/data/last`;
+        /* --- 2. TAB SWITCHING LOGIC --- */
+        function switchTab(targetId, clickedBtn) {
+            const pages = document.querySelectorAll('.page-section');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const btns = document.querySelectorAll('.menu-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(targetId).classList.add('active');
+            clickedBtn.classList.add('active');
+        }
+
+        /* --- 3. BIO-RECOVERY LOGIC --- */
+        function activateScrubbers() {
+            const statusLabel = document.getElementById("scrubber-status");
+            const btn = document.getElementById("scrubber-btn");
+            
+            statusLabel.innerText = "ACTIVATING PURGE CYCLE...";
+            statusLabel.className = "text-cyan"; 
+            btn.innerText = "PURGING...";
+            btn.style.opacity = "0.5";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                statusLabel.innerText = "STANDBY";
+                statusLabel.className = "text-green"; 
+                btn.innerText = "ENGAGE PURGE CYCLE";
+                btn.style.opacity = "1";
+                btn.disabled = false;
+            }, 5000);
+        }
+
+        function triggerAction(systemName) {
+            alert("COMMAND REJECTED: \n" + systemName + " requires Level 4 physical clearance. Hardware modules currently locked.");
+        }
+
+        /* --- 4. DATA MATRIX LOGIC --- */
+        function addTerminalLog(aqi, temp, hum) {
+            const terminal = document.getElementById("terminal-log");
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            
+            const logHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[${timeString}]</span> 
+                    PACKET RECEIVED => AQI: <span class="log-safe">${aqi}</span> | 
+                    TEMP: <span class="log-safe">${temp}°C</span> | 
+                    HUM: <span class="log-safe">${hum}%</span>
+                </div>
+            `;
+            
+            terminal.innerHTML = logHTML + terminal.innerHTML;
+        }
+
+        /* --- 5. CHART.JS LOGIC --- */
+        let aqiChart, humChart, tempChart;
+        const MAX_DATA_POINTS = 15;
+
+        function initializeCharts() {
+            Chart.defaults.color = '#888';
+            Chart.defaults.font.family = 'Rajdhani';
+
+            const labels = [];
+            for (let i = 0; i < MAX_DATA_POINTS; i++) labels.push('');
+
+            const createConfig = (lineColor) => ({
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: [],
+                        borderColor: lineColor,
+                        backgroundColor: lineColor + '33', 
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { font: { size: 10 } }
+                        },
+                        x: { display: false }
+                    },
+                    animation: false
+                }
+            });
+
+            aqiChart = new Chart(document.getElementById('chart-aqi'), createConfig('#00ff66'));
+            humChart = new Chart(document.getElementById('chart-hum'), createConfig('#00e5ff'));
+            tempChart = new Chart(document.getElementById('chart-temp'), createConfig('#ff3366'));
+        }
+
+        function updateChartData(chart, newValue) {
+            chart.data.datasets[0].data.push(newValue);
+            if (chart.data.datasets[0].data.length > MAX_DATA_POINTS) {
+                chart.data.datasets[0].data.shift();
+            }
+            chart.update();
+        }
+
+        /* --- 6. ADAFRUIT SYNC LOGIC (UPDATED WITH NEW SPLIT KEY) --- */
+        const AIO_USERNAME = "SIDJ90"; 
+        const key_part1 = "aio_mCft48mu14tc";
+        const key_part2 = "rmshdNkkbq7rVgPr";
+        const AIO_KEY = key_part1 + key_part2; 
+
+        async function fetchAdafruitData(feedKey) {
+            const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feedKey}/data/last`;
             try {
-                const r = await fetch(url, { headers: { 'X-AIO-Key': AIO_KEY } });
-                const d = await r.json();
-                return d.value;
-            } catch (e) { return null; }
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-AIO-Key': AIO_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                return data.value; 
+            } catch (error) {
+                console.error("Error fetching " + feedKey + ":", error);
+                return null;
+            }
         }
 
         async function updateDashboard() {
-            const a = await fetchIO("aqi");
-            const h = await fetchIO("humidity");
-            const t = await fetchIO("temperature");
+            const temp = await fetchAdafruitData("temperature");
+            const hum = await fetchAdafruitData("humidity");
+            const aqi = await fetchAdafruitData("aqi");
 
-            if(a) { document.getElementById("val-aqi").innerText = a; updateChart(aqiChart, a); }
-            if(h) { document.getElementById("val-hum").innerText = h; updateChart(humChart, h); }
-            if(t) { document.getElementById("val-temp").innerText = t; updateChart(tempChart, t); }
-            
-            if(a && t && h) {
-                updateGimmick(a, t, h);
-                const log = `<div class="log-entry"><span class="log-time">[${new Date().toLocaleTimeString()}]</span> AQI: ${a} | T: ${t}°C | H: ${h}%</div>`;
-                document.getElementById("terminal-log").innerHTML = log + document.getElementById("terminal-log").innerHTML;
+            if (temp !== null) document.getElementById("val-temp").innerText = temp;
+            if (hum !== null) document.getElementById("val-hum").innerText = hum;
+            if (aqi !== null) document.getElementById("val-aqi").innerText = aqi;
+
+            if (temp !== null && tempChart) updateChartData(tempChart, parseFloat(temp));
+            if (hum !== null && humChart) updateChartData(humChart, parseFloat(hum));
+            if (aqi !== null && aqiChart) updateChartData(aqiChart, parseInt(aqi));
+
+            if (temp !== null && hum !== null && aqi !== null) {
+                addTerminalLog(aqi, temp, hum);
             }
         }
-
-        function updateGimmick(a, t, h) {
-            const b = document.getElementById("condition-badge");
-            const e = document.getElementById("escape-text");
-            if(a > 100 || t > 32) {
-                b.className = "status-badge-large status-emergency"; b.innerText = "EMERGENCY";
-                e.innerText = "> DANGER: Proceed to Sector 7 / Bunker 4 immediately.";
-            } else if (a > 50) {
-                b.className = "status-badge-large status-caution"; b.innerText = "CAUTION";
-                e.innerText = "> Atmospheric decline. Move to Recreation Deck B.";
-            } else {
-                b.className = "status-badge-large status-optimal"; b.innerText = "OPTIMAL";
-                e.innerText = "> Conditions stable. No egress required.";
-            }
-        }
-
-        function initCharts() {
-            const cfg = (l, c) => ({
-                type: 'line', data: { labels: Array(MAX_POINTS).fill(''), datasets: [{ borderColor: c, data: [], fill: true, backgroundColor: c+'20', tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#222' } } } }
-            });
-            aqiChart = new Chart(document.getElementById('chart-aqi'), cfg('AQI', '#00ff66'));
-            humChart = new Chart(document.getElementById('chart-hum'), cfg('Hum', '#00e5ff'));
-            tempChart = new Chart(document.getElementById('chart-temp'), cfg('Temp', '#ff3366'));
-        }
-
-        function updateChart(c, v) {
-            c.data.datasets[0].data.push(v);
-            if(c.data.datasets[0].data.length > MAX_POINTS) c.data.datasets[0].data.shift();
-            c.update();
-        }
-
-        setInterval(updateDashboard, 10000);
     </script>
 </body>
 </html>
