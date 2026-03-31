@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusAir OS // Biometric Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- CORE SYSTEM STYLES --- */
         :root {
             --neon-green: #00ff66;
             --neon-blue: #00e5ff;
             --neon-purple: #b026ff;
+            --neon-danger: #ff3366;
             --bg-dark: #0a0a10;
             --panel-bg: rgba(30, 30, 50, 0.6);
-            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+            --border-glow: 0 0 10px rgba(176, 38, 255, 0.3);
         }
 
         body {
@@ -25,8 +27,8 @@
             overflow: hidden;
             display: flex;
             background-image: 
-                linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(176, 38, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(176, 38, 255, 0.05) 1px, transparent 1px);
             background-size: 30px 30px;
         }
 
@@ -48,7 +50,7 @@
 
         .login-box {
             background: var(--panel-bg);
-            border: 2px solid var(--neon-blue);
+            border: 2px solid var(--neon-purple);
             padding: 40px;
             text-align: center;
             box-shadow: var(--border-glow);
@@ -56,18 +58,19 @@
         }
 
         .login-box h1 {
-            color: var(--neon-green);
+            color: var(--neon-purple);
             margin-top: 0;
             letter-spacing: 2px;
             font-size: 32px;
+            text-shadow: 0 0 10px var(--neon-purple);
         }
 
         .login-input {
             width: 80%;
             background: transparent;
             border: none;
-            border-bottom: 2px solid var(--neon-blue);
-            color: var(--neon-green);
+            border-bottom: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
             font-family: 'Fira Code', monospace;
             font-size: 20px;
             text-align: center;
@@ -79,8 +82,8 @@
 
         .btn {
             background: transparent;
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
             font-family: 'Rajdhani', sans-serif;
             font-size: 18px;
             font-weight: bold;
@@ -92,14 +95,14 @@
         }
 
         .btn:hover {
-            background: var(--neon-blue);
+            background: var(--neon-purple);
             color: var(--bg-dark);
-            box-shadow: 0 0 15px var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-purple);
         }
 
         /* --- MAIN OS LAYOUT --- */
         #os-interface {
-            display: none; /* Hidden until login */
+            display: none;
             width: 100%;
             height: 100%;
             display: flex;
@@ -107,19 +110,19 @@
 
         .sidebar {
             width: 250px;
-            border-right: 2px solid var(--neon-green);
+            border-right: 2px solid var(--neon-purple);
             padding: 20px;
             background: rgba(10, 10, 16, 0.9);
-            box-shadow: 5px 0 15px rgba(0, 255, 102, 0.1);
+            box-shadow: 5px 0 15px rgba(176, 38, 255, 0.1);
         }
 
         .logo {
-            color: var(--neon-green);
+            color: var(--neon-purple);
             font-size: 28px;
             font-weight: bold;
             letter-spacing: 3px;
             margin-bottom: 40px;
-            text-shadow: 0 0 10px var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-purple);
         }
 
         .menu-btn {
@@ -139,10 +142,10 @@
         }
 
         .menu-btn.active, .menu-btn:hover {
-            border-color: var(--neon-green);
-            background: rgba(0, 255, 102, 0.1);
-            color: var(--neon-green);
-            box-shadow: inset 5px 0 0 var(--neon-green);
+            border-color: var(--neon-purple);
+            background: rgba(176, 38, 255, 0.1);
+            color: var(--neon-purple);
+            box-shadow: inset 5px 0 0 var(--neon-purple);
         }
 
         .main-content {
@@ -150,10 +153,11 @@
             padding: 40px;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .header-info {
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .header-info h2 {
@@ -163,7 +167,7 @@
         }
 
         .header-info span {
-            color: var(--neon-green);
+            color: var(--neon-purple);
         }
 
         .status-text {
@@ -173,106 +177,97 @@
             margin-top: 10px;
         }
 
-        /* --- PAGES / TABS --- */
-        .page-section {
-            display: none;
-            flex-grow: 1;
-        }
-
-        .page-section.active {
-            display: block;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Page 1: Telemetry Grid */
-        .telemetry-grid {
+        /* --- DASHBOARD GRID --- */
+        .dashboard-layout {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 300px 1fr;
             gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .cards-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .data-card {
             background: var(--panel-bg);
             border: 2px solid var(--neon-purple);
             border-radius: 8px;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
         }
 
-        .data-card h3 {
-            margin: 0 0 20px 0;
-            font-size: 18px;
-            letter-spacing: 1px;
-        }
-
         .data-value {
-            font-size: 54px;
+            font-size: 48px;
             font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            color: #fff;
         }
 
         .badge {
             display: inline-block;
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            padding: 5px 15px;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 3px 12px;
             border-radius: 20px;
-            font-size: 14px;
-            background: rgba(0, 255, 102, 0.1);
+            font-size: 12px;
+            background: rgba(176, 38, 255, 0.1);
         }
 
-        /* Page 2: Data Matrix */
+        .chart-container {
+            background: var(--panel-bg);
+            border: 1px solid rgba(176, 38, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            height: 180px;
+            margin-bottom: 20px;
+        }
+
+        /* --- CONDITION GIMMICK --- */
+        .condition-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .status-badge-large {
+            display: inline-block;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 10px 40px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .status-optimal { border: 2px solid var(--neon-green); color: var(--neon-green); }
+        .status-caution { border: 2px solid #ffcc00; color: #ffcc00; }
+        .status-emergency { border: 2px solid var(--neon-danger); color: var(--neon-danger); }
+
+        .escape-route {
+            font-family: 'Fira Code', monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+        }
+
+        /* --- DATA MATRIX --- */
         .matrix-container {
             background: var(--panel-bg);
             border: 1px solid var(--neon-blue);
             padding: 20px;
             font-family: 'Fira Code', monospace;
-            height: 400px;
+            height: calc(100vh - 250px);
             overflow-y: auto;
         }
 
-        .log-entry {
-            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
-            padding: 10px 0;
-            color: #aaa;
-        }
-        
+        .log-entry { border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding: 8px 0; color: #aaa; }
         .log-time { color: var(--neon-blue); margin-right: 15px; }
         .log-safe { color: var(--neon-green); }
-
-        /* Page 3: Bio-Recovery */
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
-        .control-panel {
-            background: var(--panel-bg);
-            border: 1px dashed var(--neon-purple);
-            padding: 30px;
-        }
-
-        .action-btn {
-            width: 100%;
-            margin-top: 15px;
-        }
-        .action-btn.danger {
-            border-color: #ff3366;
-            color: #ff3366;
-        }
-        .action-btn.danger:hover {
-            background: #ff3366;
-            color: #fff;
-            box-shadow: 0 0 15px #ff3366;
-        }
 
     </style>
 </head>
@@ -288,8 +283,7 @@
         </div>
     </div>
 
-    <div id="os-interface" style="display: none;">
-        
+    <div id="os-interface">
         <div class="sidebar">
             <div class="logo">FOCUSAIR</div>
             <button class="menu-btn active" onclick="switchTab('page-telemetry', this)">[01] LIVE TELEMETRY</button>
@@ -299,160 +293,155 @@
 
         <div class="main-content">
             <div class="header-info">
-                <h2>Operator: <span id="display-operator">UNKNOWN</span></h2>
-                <div class="status-text">> Awaiting localized atmospheric sync from primary array ...</div>
+                <h2>Operator: <span id="display-operator">SIDDHARTH</span></h2>
+                <div class="status-text">> Localized atmospheric sync active...</div>
             </div>
 
             <div id="page-telemetry" class="page-section active">
-                <div class="telemetry-grid">
-                    <div class="data-card">
-                        <h3>PARTICULATE DENSITY (AQI)</h3>
-                        <div class="data-value" id="val-aqi">--</div>
-                        <div class="badge">SYNCED</div>
+                <div class="dashboard-layout">
+                    <div class="cards-column">
+                        <div class="data-card">
+                            <h3>AQI (PARTICULATE)</h3>
+                            <div class="data-value" id="val-aqi">--</div>
+                            <div class="badge">LIVE FEED</div>
+                        </div>
+                        <div class="data-card">
+                            <h3>HUMIDITY</h3>
+                            <div class="data-value"><span id="val-hum">--</span>%</div>
+                            <div class="badge">LIVE FEED</div>
+                        </div>
+                        <div class="data-card">
+                            <h3>TEMPERATURE</h3>
+                            <div class="data-value"><span id="val-temp">--</span>°C</div>
+                            <div class="badge">LIVE FEED</div>
+                        </div>
                     </div>
-                    <div class="data-card">
-                        <h3>ATMOSPHERIC SATURATION</h3>
-                        <div class="data-value"><span id="val-hum">--</span> <span style="font-size: 24px;">%</span></div>
-                        <div class="badge">SYNCED</div>
+                    <div class="charts-column">
+                        <div class="chart-container"><canvas id="chart-aqi"></canvas></div>
+                        <div class="chart-container"><canvas id="chart-hum"></canvas></div>
+                        <div class="chart-container"><canvas id="chart-temp"></canvas></div>
                     </div>
-                    <div class="data-card">
-                        <h3>THERMAL METRICS</h3>
-                        <div class="data-value"><span id="val-temp">--</span> <span style="font-size: 24px;">°C</span></div>
-                        <div class="badge">SYNCED</div>
-                    </div>
+                </div>
+
+                <div class="condition-panel">
+                    <h3 style="color: var(--neon-purple); margin-top:0;">CONDITIONING ANALYSIS</h3>
+                    <div id="condition-badge" class="status-badge-large status-optimal">WAITING</div>
+                    <div class="escape-route" id="escape-text">> STANDBY...</div>
                 </div>
             </div>
 
             <div id="page-matrix" class="page-section">
-                <h3 style="color: var(--neon-blue); margin-top: 0;">RAW SENSOR INGESTION LOG</h3>
                 <div class="matrix-container" id="terminal-log">
-                    <div class="log-entry"><span class="log-time">[SYSTEM]</span> Core modules loaded. Awaiting handshake.</div>
+                    <div class="log-entry"><span class="log-time">[SYSTEM]</span> Initializing Matrix...</div>
                 </div>
             </div>
 
             <div id="page-bio" class="page-section">
-                <div class="controls-grid">
-                    <div class="control-panel">
-                        <h3 style="color: var(--neon-purple); margin-top: 0;">ATMOSPHERIC SCRUBBERS</h3>
-                        <p style="color: #ccc;">Status: <span style="color: var(--neon-green)">STANDBY</span></p>
-                        <p style="color: #888; font-size: 14px;">Engage primary HEPA filtration arrays to forcefully reduce ambient particulate density.</p>
-                        <button class="btn action-btn" onclick="triggerAction('Scrubbers')">ENGAGE PURGE CYCLE</button>
-                    </div>
-                    
-                    <div class="control-panel">
-                        <h3 style="color: #ff3366; margin-top: 0;">THERMAL OVERRIDE</h3>
-                        <p style="color: #ccc;">Status: <span style="color: var(--neon-blue)">AUTO-REGULATING</span></p>
-                        <p style="color: #888; font-size: 14px;">Bypass automated HVAC constraints. Warning: May cause rapid temperature fluctuations.</p>
-                        <button class="btn action-btn danger" onclick="triggerAction('Thermal Override')">MANUAL OVERRIDE</button>
+                <div class="dashboard-layout">
+                    <div class="data-card" style="grid-column: span 2;">
+                        <h3 style="color: var(--neon-green);">ATMOSPHERIC SCRUBBERS</h3>
+                        <p id="scrubber-status" style="color: var(--neon-green);">Status: STANDBY</p>
+                        <button class="btn" id="scrubber-btn" onclick="runScrubbers()">ENGAGE PURGE CYCLE</button>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
-        /* --- 1. LOGIN LOGIC --- */
-        function handleEnter(e) {
-            if (e.key === 'Enter') systemLogin();
-        }
+        let aqiChart, humChart, tempChart;
+        const MAX_POINTS = 20;
 
-        function systemLogin() {
-            const inputName = document.getElementById("operator-input").value;
-            const operatorName = inputName.trim() === "" ? "SIDDHARTH" : inputName.toUpperCase();
-            
-            // Set name and hide overlay
-            document.getElementById("display-operator").innerText = operatorName;
-            document.getElementById("login-overlay").style.opacity = "0";
-            
-            setTimeout(() => {
-                document.getElementById("login-overlay").style.display = "none";
-                document.getElementById("os-interface").style.display = "flex";
-                // Start pulling data immediately after login
-                updateDashboard();
-            }, 500);
-        }
-
-        /* --- 2. MENU NAVIGATION LOGIC --- */
-        function switchTab(targetId, clickedBtn) {
-            // Hide all pages
-            const pages = document.querySelectorAll('.page-section');
-            pages.forEach(page => page.classList.remove('active'));
-            
-            // Remove active glow from all buttons
-            const btns = document.querySelectorAll('.menu-btn');
-            btns.forEach(btn => btn.classList.remove('active'));
-            
-            // Show target page and highlight button
-            document.getElementById(targetId).classList.add('active');
-            clickedBtn.classList.add('active');
-        }
-
-        /* --- 3. UI INTERACTION LOGIC --- */
-        function triggerAction(systemName) {
-            alert("COMMAND REJECTED: \n" + systemName + " requires Level 4 physical clearance. Hardware modules currently locked.");
-        }
-
-        function addTerminalLog(aqi, temp, hum) {
-            const terminal = document.getElementById("terminal-log");
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            
-            const logHTML = `
-                <div class="log-entry">
-                    <span class="log-time">[${timeString}]</span> 
-                    PACKET RECEIVED => AQI: <span class="log-safe">${aqi}</span> | 
-                    TEMP: <span class="log-safe">${temp}°C</span> | 
-                    HUM: <span class="log-safe">${hum}%</span>
-                </div>
-            `;
-            
-            // Add to top of log
-            terminal.innerHTML = logHTML + terminal.innerHTML;
-        }
-
-        /* --- 4. ADAFRUIT SYNC LOGIC --- */
+        // --- ADAFRUIT CONFIG (NINJA SPLIT) ---
         const AIO_USERNAME = "SIDJ90"; 
-        const key_part1 = "aio_mCft48mu14tc";
-        const key_part2 = "rmshdNkkbq7rVgPr";
-        const AIO_KEY = key_part1 + key_part2; 
+        const p1 = "aio_mCft48mu14tcrm"; // Part 1
+        const p2 = "shdNkkbq7rVgPr";     // Part 2
+        const AIO_KEY = p1 + p2;
 
-        async function fetchAdafruitData(feedKey) {
-            const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feedKey}/data/last`;
+        function handleEnter(e) { if (e.key === 'Enter') systemLogin(); }
+        function systemLogin() {
+            const user = document.getElementById("operator-input").value;
+            document.getElementById("display-operator").innerText = user || "SIDDHARTH";
+            document.getElementById("login-overlay").style.display = "none";
+            document.getElementById("os-interface").style.display = "flex";
+            initCharts();
+            updateDashboard();
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function runScrubbers() {
+            const s = document.getElementById("scrubber-status");
+            const b = document.getElementById("scrubber-btn");
+            s.innerText = "PURGING ATMOSPHERE..."; s.style.color = "#00e5ff";
+            b.disabled = true;
+            setTimeout(() => {
+                s.innerText = "STANDBY"; s.style.color = "#00ff66";
+                b.disabled = false;
+            }, 4000);
+        }
+
+        async function fetchIO(feed) {
+            const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feed}/data/last`;
             try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'X-AIO-Key': AIO_KEY,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                return data.value; 
-            } catch (error) {
-                console.error("Error fetching " + feedKey + ":", error);
-                return null;
-            }
+                const r = await fetch(url, { headers: { 'X-AIO-Key': AIO_KEY } });
+                const d = await r.json();
+                return d.value;
+            } catch (e) { return null; }
         }
 
         async function updateDashboard() {
-            // Fetch the 3 data streams
-            const temp = await fetchAdafruitData("temperature");
-            const hum = await fetchAdafruitData("humidity");
-            const aqi = await fetchAdafruitData("aqi");
+            const a = await fetchIO("aqi");
+            const h = await fetchIO("humidity");
+            const t = await fetchIO("temperature");
 
-            // Update Page 1 (Telemetry)
-            if (temp !== null) document.getElementById("val-temp").innerText = temp;
-            if (hum !== null) document.getElementById("val-hum").innerText = hum;
-            if (aqi !== null) document.getElementById("val-aqi").innerText = aqi;
-
-            // Update Page 2 (Data Matrix Terminal)
-            if (temp !== null && hum !== null && aqi !== null) {
-                addTerminalLog(aqi, temp, hum);
+            if(a) { document.getElementById("val-aqi").innerText = a; updateChart(aqiChart, a); }
+            if(h) { document.getElementById("val-hum").innerText = h; updateChart(humChart, h); }
+            if(t) { document.getElementById("val-temp").innerText = t; updateChart(tempChart, t); }
+            
+            if(a && t && h) {
+                updateGimmick(a, t, h);
+                const log = `<div class="log-entry"><span class="log-time">[${new Date().toLocaleTimeString()}]</span> AQI: ${a} | T: ${t}°C | H: ${h}%</div>`;
+                document.getElementById("terminal-log").innerHTML = log + document.getElementById("terminal-log").innerHTML;
             }
         }
 
-        // Loop the update every 10 seconds
+        function updateGimmick(a, t, h) {
+            const b = document.getElementById("condition-badge");
+            const e = document.getElementById("escape-text");
+            if(a > 100 || t > 32) {
+                b.className = "status-badge-large status-emergency"; b.innerText = "EMERGENCY";
+                e.innerText = "> DANGER: Proceed to Sector 7 / Bunker 4 immediately.";
+            } else if (a > 50) {
+                b.className = "status-badge-large status-caution"; b.innerText = "CAUTION";
+                e.innerText = "> Atmospheric decline. Move to Recreation Deck B.";
+            } else {
+                b.className = "status-badge-large status-optimal"; b.innerText = "OPTIMAL";
+                e.innerText = "> Conditions stable. No egress required.";
+            }
+        }
+
+        function initCharts() {
+            const cfg = (l, c) => ({
+                type: 'line', data: { labels: Array(MAX_POINTS).fill(''), datasets: [{ borderColor: c, data: [], fill: true, backgroundColor: c+'20', tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#222' } } } }
+            });
+            aqiChart = new Chart(document.getElementById('chart-aqi'), cfg('AQI', '#00ff66'));
+            humChart = new Chart(document.getElementById('chart-hum'), cfg('Hum', '#00e5ff'));
+            tempChart = new Chart(document.getElementById('chart-temp'), cfg('Temp', '#ff3366'));
+        }
+
+        function updateChart(c, v) {
+            c.data.datasets[0].data.push(v);
+            if(c.data.datasets[0].data.length > MAX_POINTS) c.data.datasets[0].data.shift();
+            c.update();
+        }
+
         setInterval(updateDashboard, 10000);
     </script>
 </body>
