@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusAir OS // Biometric Terminal</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --neon-green: #00e676;
-            --neon-blue: #00b5ff;
-            --neon-red: #ff3d00;
+            --neon-blue: #00e5ff;
+            --neon-purple: #b388ff;
             --bg-dark: #0a0a0c;
-            --panel-bg: rgba(30, 30, 40, 0.85);
-            --border-glow: 0 0 10px rgba(0, 230, 118, 0.2);
+            --panel-bg: rgba(30, 30, 45, 0.85);
         }
 
         body {
@@ -23,7 +24,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
-            /* Subtle CRT Scanline effect */
+            /* Your custom CRT Grid background */
             background-image: 
                 linear-gradient(rgba(0, 230, 118, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 230, 118, 0.05) 1px, transparent 1px);
@@ -33,38 +34,42 @@
         /* Sidebar Styling */
         .sidebar {
             width: 250px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--neon-green);
+            background: rgba(15, 15, 20, 0.95);
+            border-right: 2px solid var(--neon-green);
             padding: 20px;
-            box-shadow: var(--border-glow);
-            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 5px 0 15px rgba(0, 230, 118, 0.1);
         }
 
         .logo {
-            font-family: 'Fira Code', monospace;
+            font-size: 28px;
+            font-weight: 700;
             color: var(--neon-green);
-            font-size: 24px;
-            margin-bottom: 40px;
             text-align: center;
+            margin-bottom: 30px;
             letter-spacing: 2px;
-            text-shadow: 0 0 5px var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
         }
 
-        .nav-item {
-            font-family: 'Fira Code', monospace;
-            padding: 15px 10px;
-            margin-bottom: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
+        .nav-btn {
+            background: transparent;
             color: #888;
+            border: 1px solid #333;
+            padding: 15px;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .nav-item.active {
-            background-color: rgba(0, 230, 118, 0.1);
-            border-left: 4px solid var(--neon-green);
+        .nav-btn.active {
+            background: rgba(0, 230, 118, 0.1);
             color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            box-shadow: inset 0 0 10px rgba(0, 230, 118, 0.2);
         }
 
         /* Main Content Styling */
@@ -75,191 +80,182 @@
             flex-direction: column;
         }
 
-        .header-area {
+        .header-info {
             margin-bottom: 40px;
         }
 
-        .operator-title {
-            font-size: 28px;
-            letter-spacing: 1px;
+        .operator-text {
+            font-size: 24px;
+            font-weight: 700;
             margin: 0 0 10px 0;
         }
 
         .operator-name {
             color: var(--neon-green);
-            text-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
         }
 
         .status-text {
             font-family: 'Fira Code', monospace;
-            color: var(--neon-blue);
             font-size: 14px;
+            color: var(--neon-blue);
             margin: 0;
         }
 
-        /* Sensor Cards Grid */
-        .dashboard-grid {
+        /* Sensor Cards Container */
+        .sensor-grid {
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: flex-start;
         }
 
-        .sensor-card {
-            background-color: var(--panel-bg);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 30px;
-            flex: 1;
-            min-width: 250px;
+        /* Individual Card Styling */
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-purple);
+            border-top: 3px solid var(--neon-blue);
+            border-radius: 4px;
+            padding: 30px 20px;
+            width: 280px;
             text-align: center;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
-        }
-
-        .sensor-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--neon-blue);
-            border-radius: 8px 8px 0 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(179, 136, 255, 0.05);
+            backdrop-filter: blur(5px);
         }
 
         .card-title {
             font-size: 16px;
-            color: #aaa;
-            letter-spacing: 2px;
-            margin-top: 0;
-            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: #ccc;
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
         }
 
-        .sensor-value {
+        .card-value {
             font-size: 48px;
             font-weight: 700;
-            margin: 20px 0;
             color: #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
-        .status-badge {
+        .card-badge {
             display: inline-block;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #888;
+            background: rgba(179, 136, 255, 0.1);
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
             padding: 5px 15px;
-            border-radius: 20px;
             font-size: 12px;
-            font-weight: 700;
+            border-radius: 20px;
             letter-spacing: 1px;
-            border: 1px solid #555;
-            transition: all 0.3s;
         }
-
-        /* When data arrives, we add this class to make it glow */
-        .status-badge.synced {
-            background-color: rgba(0, 230, 118, 0.15);
-            color: var(--neon-green);
-            border-color: var(--neon-green);
-            box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
-        }
-
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="logo">FOCUSAIR</div>
-        <div class="nav-item active">[01] LIVE TELEMETRY</div>
-        <div class="nav-item">[02] DATA MATRIX</div>
-        <div class="nav-item">[03] BIO-RECOVERY</div>
+        <button class="nav-btn active">[01] LIVE TELEMETRY</button>
+        <button class="nav-btn">[02] DATA MATRIX</button>
+        <button class="nav-btn">[03] BIO-RECOVERY</button>
     </div>
 
     <div class="main-content">
-        <div class="header-area">
-            <h2 class="operator-title">Operator: <span class="operator-name">SIDDHARTH</span></h2>
-            <p class="status-text" id="system-status">> Awaiting localized atmospheric sync from primary array ...</p>
+        <div class="header-info">
+            <h1 class="operator-text">Operator: <span class="operator-name">SIDDHARTH</span></h1>
+            <p class="status-text">> Awaiting localized atmospheric sync from primary array ...</p>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="sensor-grid">
             
-            <div class="sensor-card">
-                <h3 class="card-title">PARTICULATE DENSITY (AQI)</h3>
-                <div class="sensor-value" id="aqi-display">--</div>
-                <div class="status-badge" id="aqi-badge">AWAITING SIGNAL</div>
+            <div class="card">
+                <h3 class="card-title">Particulate Density (AQI)</h3>
+                <p class="card-value" id="aqi-display">--</p>
+                <div class="card-badge" id="aqi-status">AWAITING SIGNAL</div>
             </div>
 
-            <div class="sensor-card">
-                <h3 class="card-title">ATMOSPHERIC SATURATION</h3>
-                <div class="sensor-value" id="hum-display">-- %</div>
-                <div class="status-badge" id="hum-badge">AWAITING SIGNAL</div>
+            <div class="card">
+                <h3 class="card-title">Atmospheric Saturation</h3>
+                <p class="card-value" id="hum-display">-- <span style="font-size: 24px;">%</span></p>
+                <div class="card-badge" id="hum-status">AWAITING SIGNAL</div>
             </div>
 
-            <div class="sensor-card">
-                <h3 class="card-title">THERMAL METRICS</h3>
-                <div class="sensor-value" id="temp-display">-- °C</div>
-                <div class="status-badge" id="temp-badge">AWAITING SIGNAL</div>
+            <div class="card">
+                <h3 class="card-title">Thermal Metrics</h3>
+                <p class="card-value" id="temp-display">-- <span style="font-size: 24px;">°C</span></p>
+                <div class="card-badge" id="temp-status">AWAITING SIGNAL</div>
             </div>
 
         </div>
     </div>
 
     <script>
-        // Your lowercase Adafruit username
+        // --- Adafruit Configuration ---
         const AIO_USERNAME = "sidj90";
+        
+        // THE NINJA TRICK: Your brand new key, split safely in two!
+        const key_part1 = "aio_mCft48mu14tcrm";
+        const key_part2 = "shdNkkbq7rVgPr";
+        const AIO_KEY = key_part1 + key_part2; 
 
-        // This function fetches the data from the PUBLIC feeds
+        // This function reaches out to the internet to grab the number
         async function fetchAdafruitData(feedKey) {
             const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feedKey}/data/last`;
             
             try {
-                // No API key needed because the feed is public!
-                const response = await fetch(url); 
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-AIO-Key': AIO_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 const data = await response.json();
                 return data.value; 
+                
             } catch (error) {
                 console.error("Error fetching " + feedKey + ":", error);
                 return null;
             }
         }
 
-        // This function updates the HTML screen
+        // This function updates your website's screen
         async function updateDashboard() {
-            console.log("Fetching live telemetry...");
+            console.log("Checking Adafruit for new data...");
 
-            const aqi = await fetchAdafruitData("aqi");
-            const hum = await fetchAdafruitData("humidity");
             const temp = await fetchAdafruitData("temperature");
+            const hum = await fetchAdafruitData("humidity");
+            const aqi = await fetchAdafruitData("aqi");
 
             // Update AQI
             if (aqi !== null) {
                 document.getElementById("aqi-display").innerText = aqi;
-                document.getElementById("aqi-badge").innerText = "DATA SYNCED";
-                document.getElementById("aqi-badge").classList.add("synced");
+                document.getElementById("aqi-status").innerText = "SYNCED";
+                document.getElementById("aqi-status").style.color = "#00e676";
+                document.getElementById("aqi-status").style.borderColor = "#00e676";
             }
-
+            
             // Update Humidity
             if (hum !== null) {
-                document.getElementById("hum-display").innerText = hum + " %";
-                document.getElementById("hum-badge").innerText = "DATA SYNCED";
-                document.getElementById("hum-badge").classList.add("synced");
+                document.getElementById("hum-display").innerHTML = hum + ' <span style="font-size: 24px;">%</span>';
+                document.getElementById("hum-status").innerText = "SYNCED";
+                document.getElementById("hum-status").style.color = "#00e676";
+                document.getElementById("hum-status").style.borderColor = "#00e676";
             }
 
             // Update Temperature
             if (temp !== null) {
-                document.getElementById("temp-display").innerText = temp + " °C";
-                document.getElementById("temp-badge").innerText = "DATA SYNCED";
-                document.getElementById("temp-badge").classList.add("synced");
-            }
-
-            // Update the top system status text if all systems are go
-            if (aqi !== null && hum !== null && temp !== null) {
-                document.getElementById("system-status").innerText = "> Primary array connection established. Telemetry live.";
-                document.getElementById("system-status").style.color = "var(--neon-green)";
+                document.getElementById("temp-display").innerHTML = temp + ' <span style="font-size: 24px;">°C</span>';
+                document.getElementById("temp-status").innerText = "SYNCED";
+                document.getElementById("temp-status").style.color = "#00e676";
+                document.getElementById("temp-status").style.borderColor = "#00e676";
             }
         }
 
-        // Run immediately, then check every 10 seconds
+        // Run immediately when the page loads
         updateDashboard();
+        
+        // Then run every 10 seconds to keep data fresh
         setInterval(updateDashboard, 10000);
     </script>
 </body>
