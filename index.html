@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusAir OS // Biometric Terminal</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-green: #00e676;
-            --neon-blue: #00e5ff;
+            --neon-blue: #00b5ff;
             --neon-red: #ff3d00;
             --bg-dark: #0a0a0c;
-            --panel-bg: rgba(20, 20, 25, 0.85);
+            --panel-bg: rgba(30, 30, 40, 0.85);
+            --border-glow: 0 0 10px rgba(0, 230, 118, 0.2);
         }
 
         body {
@@ -24,422 +24,243 @@
             height: 100vh;
             overflow: hidden;
             /* Subtle CRT Scanline effect */
-            background-image: linear-gradient(rgba(0, 230, 118, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 230, 118, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: 
+                linear-gradient(rgba(0, 230, 118, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 230, 118, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
 
-        /* Cyberpunk Boot Screen */
-        #setup {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #050505;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .setup-box {
-            background: #111;
-            padding: 40px;
-            border-radius: 5px;
-            text-align: center;
-            border: 1px solid var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
-        }
-        .setup-box h2 { letter-spacing: 2px; text-transform: uppercase; }
-        
-        input {
-            padding: 12px;
-            margin: 10px;
-            border: 1px solid var(--neon-green);
-            font-size: 1.2em;
+        /* Sidebar Styling */
+        .sidebar {
             width: 250px;
-            text-align: center;
-            background: rgba(0, 230, 118, 0.05);
-            color: var(--neon-green);
-            font-family: 'Fira Code', monospace;
-            outline: none;
-        }
-        input:focus { box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
-
-        button {
-            padding: 12px 24px;
-            margin-top: 20px;
-            background-color: var(--neon-green);
-            color: #000;
-            font-weight: bold;
-            font-family: 'Fira Code', monospace;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        button:hover { background-color: #fff; box-shadow: 0 0 15px var(--neon-green); }
-
-        /* Terminal Log */
-        #boot-log {
-            margin-top: 20px;
-            font-family: 'Fira Code', monospace;
-            color: var(--neon-green);
-            font-size: 0.9em;
-            height: 60px;
-        }
-
-        /* Navigation */
-        nav {
-            width: 260px;
-            background: rgba(10, 10, 15, 0.95);
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--neon-green);
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            border-right: 1px solid rgba(0, 230, 118, 0.2);
+            box-shadow: var(--border-glow);
+            z-index: 10;
         }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            color: var(--neon-green);
+            font-size: 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+
         .nav-item {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            font-family: 'Fira Code', monospace;
+            padding: 15px 10px;
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            color: #888;
             cursor: pointer;
-            text-align: left;
-            font-size: 1.2em;
-            font-weight: bold;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
+            transition: 0.3s;
         }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(0, 230, 118, 0.1);
-            border-left: 3px solid var(--neon-green);
+
+        .nav-item.active {
+            background-color: rgba(0, 230, 118, 0.1);
+            border-left: 4px solid var(--neon-green);
             color: var(--neon-green);
         }
 
-        /* Main Content */
-        main {
+        /* Main Content Styling */
+        .main-content {
             flex-grow: 1;
             padding: 40px;
-            overflow-y: auto;
-        }
-        .section {
-            display: none;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        .section.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Sensor Cards */
-        .card-grid {
+        .header-area {
+            margin-bottom: 40px;
+        }
+
+        .operator-title {
+            font-size: 28px;
+            letter-spacing: 1px;
+            margin: 0 0 10px 0;
+        }
+
+        .operator-name {
+            color: var(--neon-green);
+            text-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+        }
+
+        .status-text {
+            font-family: 'Fira Code', monospace;
+            color: var(--neon-blue);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Sensor Cards Grid */
+        .dashboard-grid {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
-        .card {
-            background: var(--panel-bg);
-            padding: 30px;
+
+        .sensor-card {
+            background-color: var(--panel-bg);
+            border: 1px solid #333;
             border-radius: 8px;
+            padding: 30px;
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
             text-align: center;
-            border-top: 3px solid var(--neon-blue);
-            backdrop-filter: blur(10px);
-            transition: transform 0.2s;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
-        .card:hover { transform: translateY(-5px); }
-        
-        .value {
-            font-family: 'Fira Code', monospace;
-            font-size: 3.5em;
-            font-weight: bold;
-            margin: 15px 0;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--neon-blue);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #aaa;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .sensor-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 20px 0;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .status-badge {
             display: inline-block;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #888;
             padding: 5px 15px;
             border-radius: 20px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8em;
-            background: rgba(255,255,255,0.1);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid #555;
+            transition: all 0.3s;
         }
 
-        /* Analytics Chart */
-        .chart-wrapper {
-            background: var(--panel-bg);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* The USP Gimmick Box */
-        .gimmick-box {
-            background: linear-gradient(135deg, rgba(20,20,25,0.9), rgba(0, 230, 118, 0.05));
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 1px dashed var(--neon-green);
-            position: relative;
-            overflow: hidden;
-        }
-        .gimmick-box::before {
-            content: "AI DIAGNOSTIC";
-            position: absolute;
-            top: 10px; right: 10px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7em;
+        /* When data arrives, we add this class to make it glow */
+        .status-badge.synced {
+            background-color: rgba(0, 230, 118, 0.15);
             color: var(--neon-green);
-            opacity: 0.5;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
         }
 
-        .highlight { color: var(--neon-green); text-shadow: 0 0 8px rgba(0,230,118,0.4); }
-        .warning { color: var(--neon-red); text-shadow: 0 0 8px rgba(255,61,0,0.4); animation: pulse 1.5s infinite; }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
     </style>
 </head>
 <body>
 
-    <div id="setup">
-        <div class="setup-box">
-            <h2 style="color: var(--neon-green);">FocusAir OS // v3.1</h2>
-            <p style="color: #888;">Atmospheric Biometric Uplink</p>
-            <input type="text" id="userName" placeholder="ENTER OPERATOR ID" autocomplete="off">
-            <br>
-            <button onclick="bootSystem()">INITIATE LINK</button>
-            <div id="boot-log"></div>
+    <div class="sidebar">
+        <div class="logo">FOCUSAIR</div>
+        <div class="nav-item active">[01] LIVE TELEMETRY</div>
+        <div class="nav-item">[02] DATA MATRIX</div>
+        <div class="nav-item">[03] BIO-RECOVERY</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-area">
+            <h2 class="operator-title">Operator: <span class="operator-name">SIDDHARTH</span></h2>
+            <p class="status-text" id="system-status">> Awaiting localized atmospheric sync from primary array ...</p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <div class="sensor-card">
+                <h3 class="card-title">PARTICULATE DENSITY (AQI)</h3>
+                <div class="sensor-value" id="aqi-display">--</div>
+                <div class="status-badge" id="aqi-badge">AWAITING SIGNAL</div>
+            </div>
+
+            <div class="sensor-card">
+                <h3 class="card-title">ATMOSPHERIC SATURATION</h3>
+                <div class="sensor-value" id="hum-display">-- %</div>
+                <div class="status-badge" id="hum-badge">AWAITING SIGNAL</div>
+            </div>
+
+            <div class="sensor-card">
+                <h3 class="card-title">THERMAL METRICS</h3>
+                <div class="sensor-value" id="temp-display">-- °C</div>
+                <div class="status-badge" id="temp-badge">AWAITING SIGNAL</div>
+            </div>
+
         </div>
     </div>
 
-    <nav>
-        <h2 style="text-align: center; color: var(--neon-green); letter-spacing: 2px;">FOCUS<span style="color:#fff;">AIR</span></h2>
-        <div class="nav-item active" onclick="switchTab('dashboard')">[01] LIVE TELEMETRY</div>
-        <div class="nav-item" onclick="switchTab('analytics')">[02] DATA MATRIX</div>
-        <div class="nav-item" onclick="switchTab('health')">[03] BIO-RECOVERY</div>
-    </nav>
-
-    <main>
-        <div id="dashboard" class="section active">
-            <h1 style="font-size: 2.5em;">Operator: <span id="displayName" class="highlight">GUEST</span></h1>
-            <p style="color: #aaa; font-family: 'Fira Code', monospace;">> Awaiting localized atmospheric sync from primary array...</p>
-            
-            <div class="card-grid">
-                <div class="card" id="aqi-card">
-                    <h3 style="color: #888;">PARTICULATE DENSITY (AQI)</h3>
-                    <div class="value" id="aqi-val">--</div>
-                    <div class="status-badge" id="aqi-status">AWAITING SIGNAL</div>
-                </div>
-                <div class="card" id="hum-card">
-                    <h3 style="color: #888;">ATMOSPHERIC SATURATION</h3>
-                    <div class="value" id="hum-val">--<span style="font-size:0.5em">%</span></div>
-                    <div class="status-badge" id="hum-status">AWAITING SIGNAL</div>
-                </div>
-                <div class="card" id="temp-card">
-                    <h3 style="color: #888;">THERMAL METRICS</h3>
-                    <div class="value" id="temp-val">--<span style="font-size:0.5em">&deg;C</span></div>
-                    <div class="status-badge" id="temp-status">AWAITING SIGNAL</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="analytics" class="section">
-            <h1>Environmental Matrix</h1>
-            <p style="color: #aaa;">Historical data plotted from Adafruit Cloud Servers.</p>
-            <div class="chart-wrapper">
-                <canvas id="envChart"></canvas>
-            </div>
-        </div>
-
-        <div id="health" class="section">
-            <h1>Biometric Impact Analysis</h1>
-            <div class="card-grid">
-                <div class="card">
-                    <h3 style="color: var(--neon-blue);">PULMONARY LOAD</h3>
-                    <p id="fitness-impact" style="font-size: 1.2em;">Calibrating...</p>
-                </div>
-                <div class="card">
-                    <h3 style="color: var(--neon-blue);">COGNITIVE EFFICIENCY</h3>
-                    <p id="cognitive-impact" style="font-size: 1.2em;">Calibrating...</p>
-                </div>
-            </div>
-            
-            <div class="gimmick-box">
-                <h2 style="margin-top:0;">AI Evacuation Protocol</h2>
-                <h3 id="trip-suggestion" style="font-family: 'Fira Code', monospace; color: var(--neon-green);">Analyzing regional toxicity...</h3>
-                <p id="trip-reason" style="font-size: 1.1em; color: #ccc;"></p>
-            </div>
-        </div>
-    </main>
-
     <script>
-        let myChart;
-        let userName = "";
+        // Your lowercase Adafruit username
+        const AIO_USERNAME = "sidj90";
 
-        // --- ADAFRUIT IO CONFIGURATION ---
-        const AIO_USERNAME = "SIDJ90";
-        const AIO_KEY = "aio_ZvKJ4260XSSbiPEaW6z4D2AnzoRw";
-        const AIO_HEADERS = { 'X-AIO-Key': AIO_KEY, 'Content-Type': 'application/json' };
-
-        // Fake Boot Animation
-        function bootSystem() {
-            userName = document.getElementById('userName').value.trim().toUpperCase() || "UNKNOWN";
-            const log = document.getElementById('boot-log');
+        // This function fetches the data from the PUBLIC feeds
+        async function fetchAdafruitData(feedKey) {
+            const url = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/${feedKey}/data/last`;
             
-            setTimeout(() => log.innerHTML = "> Bypassing mainframes...", 300);
-            setTimeout(() => log.innerHTML = "> Syncing with Adafruit Cloud...", 800);
-            setTimeout(() => log.innerHTML = "> Calibrating DHT11 & MQ135 Sensors...", 1400);
-            setTimeout(() => {
-                document.getElementById('setup').style.display = 'none';
-                document.getElementById('displayName').innerText = userName;
-                initChart();
-                fetchAdafruitData();
-                // Refresh data every 10 seconds
-                setInterval(fetchAdafruitData, 10000);
-            }, 2000);
-        }
-
-        // Tab Switcher
-        function switchTab(tabId) {
-            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Initialize the Graph
-        function initChart() {
-            const ctx = document.getElementById('envChart').getContext('2d');
-            Chart.defaults.color = '#888';
-            Chart.defaults.font.family = "'Fira Code', monospace";
-
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        { label: 'AQI Level', borderColor: '#00e676', backgroundColor: 'rgba(0, 230, 118, 0.1)', fill: true, data: [], tension: 0.4 },
-                        { label: 'Humidity %', borderColor: '#00e5ff', data: [], tension: 0.4, borderDash: [5, 5] },
-                        { label: 'Temp °C', borderColor: '#ffeb3b', data: [], tension: 0.4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' } }
-                    },
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
-        }
-
-        // --- FETCH FROM ADAFRUIT IO ---
-        async function fetchAdafruitData() {
             try {
-                // Fetch the last 15 points from all 3 feeds simultaneously
-                const limit = 15;
-                const [tempRes, humRes, aqiRes] = await Promise.all([
-                    fetch(`https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/temperature/data?limit=${limit}`, { headers: AIO_HEADERS }),
-                    fetch(`https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/humidity/data?limit=${limit}`, { headers: AIO_HEADERS }),
-                    fetch(`https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds/aqi/data?limit=${limit}`, { headers: AIO_HEADERS })
-                ]);
-
-                const tempData = await tempRes.json();
-                const humData = await humRes.json();
-                const aqiData = await aqiRes.json();
-
-                if (tempData.length === 0) return; // No data yet
-
-                // Adafruit returns data newest-first (index 0 is current). We reverse it for the chart.
-                const currentTemp = parseFloat(tempData[0].value).toFixed(1);
-                const currentHum = parseFloat(humData[0].value).toFixed(1);
-                const currentAqi = parseInt(aqiData[0].value);
-
-                // Update Cards
-                document.getElementById('aqi-val').innerText = currentAqi;
-                document.getElementById('hum-val').innerHTML = currentHum + "<span style='font-size:0.5em'>%</span>";
-                document.getElementById('temp-val').innerHTML = currentTemp + "<span style='font-size:0.5em'>&deg;C</span>";
-
-                updateStatus(currentAqi);
-                updateHealthGimmick(currentAqi);
-
-                // Map data for Chart
-                const times = aqiData.map(d => new Date(d.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})).reverse();
-                const chartAqi = aqiData.map(d => parseFloat(d.value)).reverse();
-                const chartHum = humData.map(d => parseFloat(d.value)).reverse();
-                const chartTemp = tempData.map(d => parseFloat(d.value)).reverse();
-
-                myChart.data.labels = times;
-                myChart.data.datasets[0].data = chartAqi;
-                myChart.data.datasets[1].data = chartHum;
-                myChart.data.datasets[2].data = chartTemp;
-                myChart.update();
-
+                // No API key needed because the feed is public!
+                const response = await fetch(url); 
+                const data = await response.json();
+                return data.value; 
             } catch (error) {
-                console.error("Adafruit Sync Failed:", error);
+                console.error("Error fetching " + feedKey + ":", error);
+                return null;
             }
         }
 
-        function updateStatus(aqi) {
-            const aqiStatus = document.getElementById('aqi-status');
-            const aqiCard = document.getElementById('aqi-card');
-            
-            if (aqi < 200) {
-                aqiStatus.innerHTML = "<span style='color:var(--neon-green)'>OPTIMAL FLOW</span>";
-                aqiCard.style.borderTopColor = "var(--neon-green)";
-            } else if (aqi >= 200 && aqi < 400) {
-                aqiStatus.innerHTML = "<span style='color:#ffeb3b'>ELEVATED RISK</span>";
-                aqiCard.style.borderTopColor = "#ffeb3b";
-            } else {
-                aqiStatus.innerHTML = "<span class='warning'>CRITICAL TOXICITY</span>";
-                aqiCard.style.borderTopColor = "var(--neon-red)";
+        // This function updates the HTML screen
+        async function updateDashboard() {
+            console.log("Fetching live telemetry...");
+
+            const aqi = await fetchAdafruitData("aqi");
+            const hum = await fetchAdafruitData("humidity");
+            const temp = await fetchAdafruitData("temperature");
+
+            // Update AQI
+            if (aqi !== null) {
+                document.getElementById("aqi-display").innerText = aqi;
+                document.getElementById("aqi-badge").innerText = "DATA SYNCED";
+                document.getElementById("aqi-badge").classList.add("synced");
             }
-            
-            document.getElementById('hum-status').innerHTML = "<span style='color:var(--neon-blue)'>SENSOR ONLINE</span>";
-            document.getElementById('temp-status').innerHTML = "<span style='color:var(--neon-blue)'>SENSOR ONLINE</span>";
-        }
 
-        function updateHealthGimmick(aqi) {
-            const fitImpact = document.getElementById('fitness-impact');
-            const cogImpact = document.getElementById('cognitive-impact');
-            const tripTitle = document.getElementById('trip-suggestion');
-            const tripReason = document.getElementById('trip-reason');
+            // Update Humidity
+            if (hum !== null) {
+                document.getElementById("hum-display").innerText = hum + " %";
+                document.getElementById("hum-badge").innerText = "DATA SYNCED";
+                document.getElementById("hum-badge").classList.add("synced");
+            }
 
-            if (aqi < 200) {
-                fitImpact.innerHTML = "Pulmonary intake <span class='highlight'>optimized</span>. Muscle oxygenation at 100%. Green light for high-intensity training.";
-                cogImpact.innerHTML = "Neural load is stable. Perfect atmospheric conditions for sustained deep coding.";
-                tripTitle.innerHTML = "STATUS: GROUNDED (MAMBAKKAM)";
-                tripReason.innerHTML = "The air in Tamil Nadu is holding steady today. Lock in and execute your tasks.";
-            } else if (aqi >= 200 && aqi < 400) {
-                fitImpact.innerHTML = "Mild restriction in VO2 max detected. Advise lowering physical output.";
-                cogImpact.innerHTML = "Brain fog probability increasing by 14%. Take frequent visual breaks.";
-                tripTitle.innerHTML = "RECOMMENDED PROTOCOL: YELAGIRI RETREAT";
-                tripReason.innerHTML = "Air density is getting thick. Take a quick weekend drive up to Yelagiri. The elevation and clean hill air will flush your system in 48 hours.";
-            } else {
-                fitImpact.innerHTML = "<span class='warning'>SEVERE CARDIO RESTRICTION.</span> Micro-particulates penetrating deep tissue. Abort all outdoor activity.";
-                cogImpact.innerHTML = "<span class='warning'>CRITICAL COGNITIVE DROP.</span> Algorithmic reasoning compromised by atmospheric haze.";
-                
-                const trips = [
-                    { loc: "Hokkaido, Japan", res: "Since you're eyeing research spots in Tokyo, evacuate north to Hokkaido. The sub-zero alpine air is a total system reset." },
-                    { loc: "Zermatt, Swiss Alps", res: "Evacuate immediately to the Alps. No gas-powered cars allowed, just pure glacial oxygen to repair your lungs." },
-                    { loc: "Kodaikanal, TN", res: "Immediate local evacuation required. Get to the upper peaks of Kodaikanal until the Chennai basin clears out." }
-                ];
-                const randomTrip = trips[Math.floor(Math.random() * trips.length)];
-                
-                tripTitle.innerHTML = "URGENT EVACUATION DIRECTIVE: " + randomTrip.loc;
-                tripTitle.classList.add('warning');
-                tripReason.innerHTML = randomTrip.res;
+            // Update Temperature
+            if (temp !== null) {
+                document.getElementById("temp-display").innerText = temp + " °C";
+                document.getElementById("temp-badge").innerText = "DATA SYNCED";
+                document.getElementById("temp-badge").classList.add("synced");
+            }
+
+            // Update the top system status text if all systems are go
+            if (aqi !== null && hum !== null && temp !== null) {
+                document.getElementById("system-status").innerText = "> Primary array connection established. Telemetry live.";
+                document.getElementById("system-status").style.color = "var(--neon-green)";
             }
         }
+
+        // Run immediately, then check every 10 seconds
+        updateDashboard();
+        setInterval(updateDashboard, 10000);
     </script>
 </body>
 </html>
