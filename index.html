@@ -13,6 +13,7 @@
             --neon-blue: #00e5ff;
             --neon-purple: #b026ff;
             --neon-danger: #ff3366;
+            --neon-warning: #ffcc00;
             --bg-dark: #0a0a10;
             --panel-bg: rgba(30, 30, 50, 0.6);
             --border-glow: 0 0 10px rgba(176, 38, 255, 0.3);
@@ -83,7 +84,7 @@
 
         /* --- MAIN OS LAYOUT --- */
         #os-interface {
-            display: none; /* Hidden until login */
+            display: none; 
             width: 100%;
             height: 100%;
             display: flex;
@@ -165,14 +166,14 @@
 
         /* --- TAB SWITCHING LOGIC --- */
         .page-section {
-            display: none; /* Hides all pages by default */
+            display: none; 
             flex-grow: 1;
             animation: fadeIn 0.4s ease-out;
             width: 100%;
         }
 
         .page-section.active {
-            display: block; /* Shows only the active page */
+            display: block; 
         }
 
         @keyframes fadeIn {
@@ -244,6 +245,61 @@
             padding: 15px;
             height: 180px; 
             position: relative;
+        }
+
+        /* --- TACTICAL ADVISORY PANEL (NEW) --- */
+        .advisory-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.1);
+        }
+
+        .advisory-header {
+            color: var(--neon-purple);
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed rgba(176, 38, 255, 0.5);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .threat-level {
+            font-weight: bold;
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+
+        .advisory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .adv-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .adv-box h4 {
+            color: #888;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .adv-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 15px;
+            color: #fff;
+            line-height: 1.4;
         }
 
         /* --- PAGE 2: DATA MATRIX --- */
@@ -377,6 +433,28 @@
                     </div>
 
                 </div>
+
+                <div class="advisory-panel">
+                    <h3 class="advisory-header">
+                        TACTICAL RECOVERY & ADVISORY
+                        <span id="threat-level" class="threat-level text-green">STATUS: SYNCHRONIZING...</span>
+                    </h3>
+                    <div class="advisory-grid">
+                        <div class="adv-box">
+                            <h4>COGNITIVE LOAD</h4>
+                            <div id="adv-cognitive" class="adv-value">Awaiting sensor input to assess cognitive fatigue.</div>
+                        </div>
+                        <div class="adv-box">
+                            <h4>PHYSICAL DIRECTIVE</h4>
+                            <div id="adv-physical" class="adv-value">Awaiting environmental scan for physical directives.</div>
+                        </div>
+                        <div class="adv-box">
+                            <h4>RECOMMENDED EGRESS</h4>
+                            <div id="adv-egress" class="adv-value">Tracking safe-zones based on incoming atmospheric data.</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div id="page-matrix" class="page-section">
@@ -423,9 +501,9 @@
             setTimeout(() => {
                 document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("os-interface").style.display = "flex";
-                initializeCharts(); // Start charts after login
-                updateDashboard();  // Fetch first data
-                setInterval(updateDashboard, 10000); // Start loop
+                initializeCharts(); 
+                updateDashboard();  
+                setInterval(updateDashboard, 10000); 
             }, 500);
         }
 
@@ -483,7 +561,75 @@
             terminal.innerHTML = logHTML + terminal.innerHTML;
         }
 
-        /* --- 5. CHART.JS LOGIC --- */
+        /* --- 5. TACTICAL ADVISORY LOGIC (NEW) --- */
+        function updateAdvisory(aqi, temp, hum) {
+            const threatBadge = document.getElementById("threat-level");
+            const cogText = document.getElementById("adv-cognitive");
+            const physText = document.getElementById("adv-physical");
+            const egressText = document.getElementById("adv-egress");
+
+            let a = parseInt(aqi);
+            let t = parseFloat(temp);
+            let h = parseFloat(hum);
+
+            // CRITICAL EMERGENCY
+            if (a > 150 || t > 35) {
+                threatBadge.innerText = "STATUS: CRITICAL WARNING";
+                threatBadge.style.color = "var(--neon-danger)";
+                threatBadge.style.textShadow = "0 0 10px var(--neon-danger)";
+                
+                cogText.innerHTML = "<span style='color:var(--neon-danger)'>SEVERE DEGRADATION.</span> Reaction times heavily impaired. Spatial disorientation likely.";
+                physText.innerHTML = "CEASE ALL EXERTION. Equip Level-4 Rebreather. Immediate cardiovascular stress risk.";
+                egressText.innerHTML = "> EVACUATE IMMEDIATELY TO SUB-LEVEL MEDICAL BAY <";
+                egressText.style.color = "var(--neon-danger)";
+            } 
+            // CAUTION: HIGH AQI
+            else if (a > 100) {
+                threatBadge.innerText = "STATUS: CAUTION (PARTICULATE)";
+                threatBadge.style.color = "var(--neon-warning)";
+                threatBadge.style.textShadow = "none";
+
+                cogText.innerHTML = "<span style='color:var(--neon-warning)'>ELEVATED.</span> Micro-particulates causing focus drift and visual fatigue.";
+                physText.innerHTML = "Restrict aerobic activity. Engage N95 equivalent filtration masks.";
+                egressText.innerHTML = "Egress to Sector 4 Clean-Room for respiratory recovery.";
+                egressText.style.color = "#fff";
+            }
+            // CAUTION: HOT / HUMID
+            else if (t > 28 || h > 70) {
+                threatBadge.innerText = "STATUS: CAUTION (THERMAL/MOISTURE)";
+                threatBadge.style.color = "var(--neon-warning)";
+                threatBadge.style.textShadow = "none";
+
+                cogText.innerHTML = "<span style='color:var(--neon-warning)'>MODERATE.</span> Heat fatigue reducing cognitive processing by 14%.";
+                physText.innerHTML = "High dehydration risk! Consume 500ml H2O per hour. Avoid heavy lifting.";
+                egressText.innerHTML = "Relocate to Climate-Controlled Barracks (Deck 2).";
+                egressText.style.color = "#fff";
+            }
+            // CAUTION: COLD / DRY
+            else if (t < 18 || h < 30) {
+                threatBadge.innerText = "STATUS: CAUTION (ARID/COLD)";
+                threatBadge.style.color = "var(--neon-warning)";
+                threatBadge.style.textShadow = "none";
+
+                cogText.innerHTML = "<span style='color:var(--neon-warning)'>MODERATE.</span> Lethargy and minor neurological slowing detected.";
+                physText.innerHTML = "Extremely dry air. Hydrate mucous membranes. Keep drinking water. Static shock risk elevated.";
+                egressText.innerHTML = "Relocate to Core Thermal Zone (Deck 1).";
+                egressText.style.color = "#fff";
+            }
+            // OPTIMAL CONDITIONS
+            else {
+                threatBadge.innerText = "STATUS: OPTIMAL";
+                threatBadge.style.color = "var(--neon-green)";
+                threatBadge.style.textShadow = "0 0 10px var(--neon-green)";
+
+                cogText.innerHTML = "<span style='color:var(--neon-green)'>NOMINAL.</span> Peak operational efficiency maintained.";
+                physText.innerHTML = "Standard operations approved. Maintain baseline hydration routines.";
+                egressText.innerHTML = "Current station optimal. Evacuation not required.";
+                egressText.style.color = "#fff";
+            }
+        }
+
+        /* --- 6. CHART.JS LOGIC --- */
         let aqiChart, humChart, tempChart;
         const MAX_DATA_POINTS = 15;
 
@@ -537,7 +683,7 @@
             chart.update();
         }
 
-        /* --- 6. ADAFRUIT SYNC LOGIC (UPDATED WITH NEW SPLIT KEY) --- */
+        /* --- 7. ADAFRUIT SYNC LOGIC --- */
         const AIO_USERNAME = "SIDJ90"; 
         const key_part1 = "aio_mCft48mu14tc";
         const key_part2 = "rmshdNkkbq7rVgPr";
@@ -566,16 +712,20 @@
             const hum = await fetchAdafruitData("humidity");
             const aqi = await fetchAdafruitData("aqi");
 
+            // Update Numbers
             if (temp !== null) document.getElementById("val-temp").innerText = temp;
             if (hum !== null) document.getElementById("val-hum").innerText = hum;
             if (aqi !== null) document.getElementById("val-aqi").innerText = aqi;
 
+            // Update Charts
             if (temp !== null && tempChart) updateChartData(tempChart, parseFloat(temp));
             if (hum !== null && humChart) updateChartData(humChart, parseFloat(hum));
             if (aqi !== null && aqiChart) updateChartData(aqiChart, parseInt(aqi));
 
+            // Run Tactical Advisory
             if (temp !== null && hum !== null && aqi !== null) {
                 addTerminalLog(aqi, temp, hum);
+                updateAdvisory(aqi, temp, hum); // <-- The new magic function!
             }
         }
     </script>
