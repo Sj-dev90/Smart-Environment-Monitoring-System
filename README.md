@@ -1,4 +1,4 @@
-# 🌐 FocusAir OS // Biometric Terminal
+# 🌐 FocusAir OS
 > *A futuristic, cyberpunk-styled smart environmental monitoring system and tactical telemetry dashboard.*
 
 ![FocusAir OS Banner](https://img.shields.io/badge/STATUS-OPERATIONAL-00ff66?style=for-the-badge&logo=terminal&logoColor=00ff66)
